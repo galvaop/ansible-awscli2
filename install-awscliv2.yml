@@ -1,0 +1,31 @@
+---
+- name: install/update awscliv2
+  hosts: localhost
+  tasks:
+  
+  - name: temp file for awscli
+    tempfile:
+      state: file
+    register: file
+
+  - name: temp dir to unpack
+    tempfile:
+      state: directory
+    register: dir
+
+  - name: download awscli2
+    get_url: 
+      url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+      force: yes
+      dest: "{{ file.path }}"
+
+  - name: unpack awscli2
+    unarchive: 
+      src: "{{ file.path }}"
+      dest: "{{ dir.path }}"
+
+  - name: install/update awscliv2
+    become: yes
+    command: 
+      cmd: bash ./install -u
+      chdir: "{{ dir.path }}/aws"
